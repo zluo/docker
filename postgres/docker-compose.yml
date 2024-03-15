@@ -1,0 +1,47 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      - postgres-db-network
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@teste.com"
+      PGADMIN_DEFAULT_PASSWORD: "password"
+    ports:
+      - 16543:80
+    volumes:
+      - ./servers.json:/pgadmin4/servers.json
+    networks:
+      - postgres-db-network
+  # ngrok:
+  #   image: ngrok/ngrok:latest
+  #   restart: unless-stopped
+  #   command:
+  #     - "start"
+  #     - "--all"
+  #     - "--config"
+  #     - "/etc/ngrok.yml"
+  #   volumes:
+  #     - ./ngrok.yml:/etc/ngrok.yml
+  #   ports:
+  #     - 4040:4040
+
+volumes:
+  postgres-db-volume:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/.data
+networks:
+  postgres-db-network:
+    driver: bridge
